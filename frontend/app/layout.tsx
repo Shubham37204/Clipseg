@@ -1,5 +1,5 @@
 import type { Metadata } from "next"
-import "./globals.css" // optional but recommended
+import "./globals.css"
 
 export const metadata: Metadata = {
   title: "CLIPSeg",

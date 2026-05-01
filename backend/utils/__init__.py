@@ -44,7 +44,8 @@ def overlay_mask_on_image(
     color: tuple = (255, 0, 0)
 ) -> str:
     # 1. Resize mask to match image size
-    mask_img = Image.fromarray(mask_array)
+    mask_uint8 = (mask_array * 255).astype(np.uint8)
+    mask_img = Image.fromarray(mask_uint8)
     mask_img = mask_img.resize(image.size, resample=Image.Resampling.BILINEAR)
     mask_np = np.array(mask_img).astype(np.float32)
 

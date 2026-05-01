@@ -12,7 +12,6 @@ from utils import (
 
 router = APIRouter()
 
-
 class SegmentRequest(BaseModel):
     image_base64: str
     prompt: str
@@ -20,7 +19,7 @@ class SegmentRequest(BaseModel):
 
 class SegmentResponse(BaseModel):
     mask_base64: str
-    overlay_base64: str   # ✅ added
+    overlay_base64: str   
     prompt: str
 
 
@@ -58,7 +57,7 @@ async def segment_image(request: SegmentRequest):
         # Return response
         return SegmentResponse(
             mask_base64=mask_base64,
-            overlay_base64=overlay_base64,  # ✅ NEW
+            overlay_base64=overlay_base64,  
             prompt=request.prompt
         )
 
