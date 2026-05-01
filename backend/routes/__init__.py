@@ -2,6 +2,7 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from models import processor, model
 import torch
+import numpy as np
 
 from utils import (
     decode_base64_image,
@@ -15,7 +16,7 @@ router = APIRouter()
 class SegmentRequest(BaseModel):
     image_base64: str
     prompt: str
-
+    threshold: float = 0.5 
 
 class SegmentResponse(BaseModel):
     mask_base64: str
@@ -50,9 +51,11 @@ async def segment_image(request: SegmentRequest):
         logits = outputs.logits
         probs = torch.sigmoid(logits).squeeze().cpu().numpy()
 
+        probs = np.where(probs >= request.threshold, probs, 0)
+
         # Generate outputs
         mask_base64 = mask_to_base64(probs)
-        overlay_base64 = overlay_mask_on_image(image, probs)  # ✅ NEW
+        overlay_base64 = overlay_mask_on_image(image, probs) 
 
         # Return response
         return SegmentResponse(
