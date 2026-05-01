@@ -1,80 +1,56 @@
-# Byte-compiled / optimized / DLL files
-__pycache__/
-*.py[cod]
-*$py.class
-
-# C extensions
-*.so
-
-# Distribution / packaging
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-share/python-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
-
-# PyInstaller
-*.manifest
-*.spec
-
-# Installer logs
-pip-log.txt
-pip-delete-this-directory.txt
-
-# Unit test / coverage reports
-htmlcov/
-.tox/
-.nox/
-.coverage
-.coverage.*
-.cache
-nosetests.xml
-coverage.xml
-*.cover
-*.pycover
-.hypothesis/
-.pytest_cache/
-cover/
-
-# Environments
-.env
-.venv
-env/
-venv/
-ENV/
-env.bak/
-venv.bak/
-
-# macOS
-.DS_Store
-
-# IDEs
-.vscode/
-.idea/
-# Models (VERY IMPORTANT)
-backend/models/
-backend/models/**
-*.safetensors
-
-# Virtual env
-backend/venv/
-venv/
-
+# =========================
 # Python cache
+# =========================
 __pycache__/
 **/__pycache__/
 *.py[cod]
+*$py.class
 
+# =========================
+# Environment files
+# =========================
+.env
+.venv
+venv/
+env/
+ENV/
+
+# =========================
+# Virtual environments (project specific)
+# =========================
+backend/venv/
+
+# =========================
+# Build / packaging
+# =========================
+.Python
+build/
+dist/
+eggs/
+.eggs/
+*.egg-info/
+*.egg
+
+# =========================
+# Logs & coverage
+# =========================
+.coverage
+.coverage.*
+htmlcov/
+.pytest_cache/
+.tox/
+.nox/
+
+# =========================
+# IDE / OS
+# =========================
+.vscode/
+.idea/
+.DS_Store
+
+# =========================
+# Models (IMPORTANT)
+# =========================
+backend/models/*
+!backend/models/__init__.py
+*.safetensors

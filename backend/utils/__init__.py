@@ -35,3 +35,41 @@ def mask_to_base64(mask_array: np.ndarray) -> str:
     buffer = io.BytesIO()
     mask_image.save(buffer, format="PNG")
     return base64.b64encode(buffer.getvalue()).decode("utf-8")
+
+
+def overlay_mask_on_image(
+    image: Image.Image,
+    mask_array: np.ndarray,
+    alpha: float = 0.5,
+    color: tuple = (255, 0, 0)
+) -> str:
+    # 1. Resize mask to match image size
+    mask_img = Image.fromarray(mask_array)
+    mask_img = mask_img.resize(image.size, resample=Image.Resampling.BILINEAR)
+    mask_np = np.array(mask_img).astype(np.float32)
+
+    # 2. Normalize mask to 0–1
+    if mask_np.max() > 0:
+        mask_np = mask_np / mask_np.max()
+
+    # apply alpha
+    mask_np = mask_np * alpha
+
+    # convert to 0–255 grayscale
+    mask_np = (mask_np * 255).astype(np.uint8)
+
+    # convert to PIL "L" image (grayscale mask)
+    mask_l = Image.fromarray(mask_np, mode="L")
+
+    # 3. Create color layer
+    color_layer = Image.new("RGB", image.size, color)
+
+    # 4. Composite (blend)
+    composite = Image.composite(color_layer, image, mask_l)
+
+    # 5. Convert to base64
+    buffer = io.BytesIO()
+    composite.save(buffer, format="PNG")
+    base64_str = base64.b64encode(buffer.getvalue()).decode("utf-8")
+
+    return base64_str
