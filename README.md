@@ -1,4 +1,4 @@
-# CLIPSeg Studio 🎨
+# CLIPSeg Studio
 
 A modern, high-performance web application for **Zero-Shot Image Segmentation** using the CLIPSeg model. Isolate any object in an image using either text prompts or visual scribbles.
 
