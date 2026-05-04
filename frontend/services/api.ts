@@ -13,6 +13,19 @@ interface SegmentResponse {
   inference_ms: number
 }
 
+interface ImagePromptRequest {
+  image_base64: string
+  mask_base64: string
+  threshold: number
+}
+
+interface ImagePromptResponse {
+  mask_base64: string
+  overlay_base64: string
+  inference_ms: number
+}
+
+
 export async function segmentImage(
   request: SegmentRequest,
 ): Promise<SegmentResponse> {
@@ -32,5 +45,27 @@ export async function segmentImage(
 
   // Parse and return JSON
   const data: SegmentResponse = await response.json();
+  return data;
+}
+
+export async function segmentByImage(
+  request: ImagePromptRequest
+): Promise<ImagePromptResponse> {
+  const response = await fetch(`${API_URL}/api/segment-by-image`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(request),
+  });
+
+  // Handle errors
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`API Error: ${response.status} - ${errorText}`);
+  }
+
+  // Parse and return JSON
+  const data: ImagePromptResponse = await response.json();
   return data;
 }

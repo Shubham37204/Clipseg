@@ -1,6 +1,5 @@
 "use client";
 import { useState } from "react";
-import Image from "next/image";
 
 interface Props {
   onImageLoad: (base64: string, previewUrl: string) => void;
@@ -47,13 +46,13 @@ export default function ImageUpload({ onImageLoad }: Props) {
       {/* File Input */}
       <input
         type="file"
-        accept="image/png,image/jpeg,image/webp" // ✅ restrict picker too
+        accept="image/png,image/jpeg,image/webp" //restrict picker too
         onChange={handleFileChange}
       />
 
       {/* Preview */}
       {preview && (
-        <Image
+        <img
           src={preview}
           alt="Preview"
           className="max-w-sm rounded-lg border"
