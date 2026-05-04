@@ -1,5 +1,9 @@
 import type { Metadata } from "next"
 import "./globals.css"
+import { cn } from "@/lib/utils";
+
+import { ThemeProvider } from "@/components/ThemeProvider";
+import { Toaster } from "sonner";
 
 export const metadata: Metadata = {
   title: "CLIPSeg",
@@ -12,12 +16,18 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
-      <body className="bg-gray-50 text-gray-900 min-h-screen">
-        <main className="max-w-4xl mx-auto p-6">
+    <html lang="en" suppressHydrationWarning>
+      <body className="bg-background text-foreground min-h-screen antialiased">
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="dark"
+          enableSystem
+          disableTransitionOnChange
+        >
           {children}
-        </main>
+          <Toaster richColors position="bottom-right" />
+        </ThemeProvider>
       </body>
     </html>
-  )
+  );
 }
