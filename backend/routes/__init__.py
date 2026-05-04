@@ -72,6 +72,12 @@ async def segment_image(request: SegmentRequest):
         logits = outputs.logits
         probs = torch.sigmoid(logits).squeeze().cpu().numpy()
         probs = np.where(probs >= request.threshold, probs, 0)
+        
+        if probs.max() == 0:
+            raise HTTPException(
+                status_code=422,
+                detail="No object detected. Try lowering the Confidence Threshold."
+            )
 
         # Generate outputs
         mask_base64 = mask_to_base64(probs)
@@ -130,6 +136,12 @@ async def segment_by_image(request: ImagePromptRequest):
         print(f"probs min={probs.min():.4f} max={probs.max():.4f}")
 
         probs = np.where(probs >= request.threshold, probs, 0)
+
+        if probs.max() == 0:
+            raise HTTPException(
+                status_code=422,
+                detail="No object detected. Try lowering the threshold or drawing more clearly."
+            )
 
         mask_base64 = mask_to_base64(probs)
         overlay_base64 = overlay_mask_on_image(image, probs)

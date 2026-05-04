@@ -1,6 +1,5 @@
 "use client";
-
-import { useState } from "react";
+import { useState, useRef } from "react";
 import ImageUpload from "@/components/ImageUpload";
 import TextPrompt from "@/components/TextPrompt";
 import CanvasDrawer from "@/components/CanvasDrawer";
@@ -11,7 +10,9 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
+import { Slider } from "@/components/ui/slider";
 import { toast } from "sonner";
+import { Loader2, Check } from "lucide-react";
 
 type Mode = "text" | "image";
 type Step = "upload" | "choose" | "prompt" | "result";
@@ -28,7 +29,7 @@ export default function WorkspacePage() {
   const [overlayBase64, setOverlayBase64] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [threshold, setThreshold] = useState(0.5);
+  const [threshold, setThreshold] = useState(0.3);
   const [inferenceMs, setInferenceMs] = useState<number | null>(null);
   const [userScribble, setUserScribble] = useState("");
 
@@ -102,6 +103,17 @@ export default function WorkspacePage() {
     setError("");
     setInferenceMs(null);
     setUserScribble("");
+  };
+
+  const canvasRef = useRef<any>(null);
+
+  const handleImageSubmit = () => {
+    if (canvasRef.current?.hasDrawing()) {
+      const mask = canvasRef.current.extractMask();
+      handleMaskReady(mask);
+    } else {
+      toast.error("Please draw on the image first");
+    }
   };
 
   return (
@@ -179,74 +191,9 @@ export default function WorkspacePage() {
               </Card>
             </div>
           ) : (
-            <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-              <div className="lg:col-span-5 space-y-6">
-                <Card className="p-6 border-primary/20 bg-card/50 backdrop-blur shadow-xl">
-                  {step === "prompt" && (
-                    <div className="flex flex-col gap-4">
-                      <div className="flex items-center justify-between mb-4">
-                         <h3 className="text-xl font-bold">Step 3: Define Selection</h3>
-                         <Button variant="ghost" size="sm" onClick={() => setStep("choose")} className="text-xs">Change Mode</Button>
-                      </div>
-                      {mode === "text" && (
-                        <TextPrompt
-                          value={prompt}
-                          onChange={setPrompt}
-                          onSubmit={handleTextSubmit}
-                          loading={loading}
-                          threshold={threshold}
-                          onThresholdChange={setThreshold}
-                        />
-                      )}
-                      {mode === "image" && (
-                        <div className="space-y-4">
-                          <p className="text-sm text-muted-foreground p-6 text-center border-2 border-dashed rounded-lg bg-muted/20">
-                            Use the drawing tools on the right to mark the object you want to isolate.
-                          </p>
-                          <div className="space-y-4">
-                             <div className="flex items-center justify-between">
-                               <span className="text-sm font-medium">Confidence Threshold</span>
-                               <span className="text-xs font-mono bg-muted px-1.5 py-0.5 rounded text-muted-foreground">
-                                 {threshold.toFixed(2)}
-                               </span>
-                             </div>
-                             <Slider
-                               min={0}
-                               max={1}
-                               step={0.01}
-                               value={[threshold]}
-                               onValueChange={(val) => {
-                               if (Array.isArray(val) && val.length > 0) {
-                                 setThreshold(val[0]);
-                               } else if (typeof val === "number") {
-                                 setThreshold(val);
-                               }
-                             }}
-                               className="py-4"
-                             />
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  )}
-
-                  {error && <p className="text-destructive font-medium bg-destructive/10 p-3 rounded-md border border-destructive/20 mt-4">{error}</p>}
-
-                  {step === "result" && (
-                    <div className="mt-6 flex flex-col gap-4">
-                      <h3 className="text-xl font-bold mb-2">Analysis Complete</h3>
-                      <Button variant="default" onClick={handleReset} className="w-full h-12 rounded-full font-bold shadow-lg shadow-primary/20">
-                        Start New Analysis
-                      </Button>
-                      <Button variant="outline" onClick={() => setStep("prompt")} className="w-full h-12 rounded-full font-semibold">
-                        Refine Selection
-                      </Button>
-                    </div>
-                  )}
-                </Card>
-              </div>
-
-              <div className="lg:col-span-7">
+            <div className="flex flex-col gap-8 max-w-5xl mx-auto">
+              {/* Image Preview (Now on Top) */}
+              <div className="w-full">
                 <Card className="relative overflow-hidden border-border bg-muted/30 backdrop-blur flex items-center justify-center p-4 min-h-[400px]">
                   {(step === "prompt" && mode === "text") && previewUrl && (
                     <img 
@@ -258,8 +205,8 @@ export default function WorkspacePage() {
 
                   {step === "prompt" && mode === "image" && previewUrl && (
                     <CanvasDrawer
+                      ref={canvasRef}
                       imageUrl={previewUrl}
-                      onMaskReady={handleMaskReady}
                     />
                   )}
 
@@ -281,6 +228,88 @@ export default function WorkspacePage() {
                           <p className="text-xl font-bold text-primary">AI Isolating Object...</p>
                         </div>
                      </div>
+                  )}
+                </Card>
+              </div>
+
+              {/* Controls (Now on Bottom) */}
+              <div className="w-full">
+                <Card className="p-6 border-primary/20 bg-card/50 backdrop-blur shadow-xl">
+                  {step === "prompt" && (
+                    <div className="flex flex-col gap-4">
+                      <div className="flex items-center justify-between mb-4">
+                         <h3 className="text-xl font-bold">Step 3: Define Selection</h3>
+                         <Button variant="ghost" size="sm" onClick={() => setStep("choose")} className="text-xs">Change Mode</Button>
+                      </div>
+                      {mode === "text" && (
+                        <TextPrompt
+                          value={prompt}
+                          onChange={setPrompt}
+                          onSubmit={handleTextSubmit}
+                          loading={loading}
+                          threshold={threshold}
+                          onThresholdChange={setThreshold}
+                        />
+                      )}
+                      {mode === "image" && (
+                      <div className="space-y-6">
+                        <p className="text-sm text-muted-foreground p-6 text-center border-2 border-dashed rounded-lg bg-muted/20">
+                          Use the drawing tools above to mark the object you want to isolate.
+                        </p>
+                        
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-end">
+                          <div className="space-y-4">
+                             <div className="flex items-center justify-between">
+                               <span className="text-sm font-medium">Confidence Threshold</span>
+                               <span className="text-xs font-mono bg-muted px-1.5 py-0.5 rounded text-muted-foreground">
+                                 {threshold.toFixed(2)}
+                               </span>
+                             </div>
+                             <Slider
+                               min={0}
+                               max={1}
+                               step={0.01}
+                               value={[threshold]}
+                               onValueChange={(val) => {
+                                 if (Array.isArray(val) && val.length > 0) {
+                                   setThreshold(val[0]);
+                                 } else if (typeof val === "number") {
+                                   setThreshold(val);
+                                 }
+                               }}
+                               className="py-4"
+                             />
+                          </div>
+
+                          <Button 
+                            size="lg" 
+                            onClick={handleImageSubmit} 
+                            disabled={loading}
+                            className="w-full h-12 rounded-full gap-2 bg-gradient-to-r from-primary to-orange-600 hover:from-primary/90 hover:to-orange-600/90 shadow-xl shadow-primary/20 transition-all hover:scale-105 active:scale-95"
+                          >
+                            {loading ? <Loader2 className="h-5 w-5 animate-spin" /> : <Check className="h-5 w-5" />}
+                            Analyze Selection
+                          </Button>
+                        </div>
+                      </div>
+                    )}
+                    </div>
+                  )}
+
+                  {error && <p className="text-destructive font-medium bg-destructive/10 p-3 rounded-md border border-destructive/20 mt-4">{error}</p>}
+
+                  {step === "result" && (
+                    <div className="mt-6 flex flex-col gap-4">
+                      <h3 className="text-xl font-bold mb-2">Analysis Complete</h3>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <Button variant="default" onClick={handleReset} className="w-full h-12 rounded-full font-bold shadow-lg shadow-primary/20">
+                          Start New Analysis
+                        </Button>
+                        <Button variant="outline" onClick={() => setStep("prompt")} className="w-full h-12 rounded-full font-semibold">
+                          Refine Selection
+                        </Button>
+                      </div>
+                    </div>
                   )}
                 </Card>
               </div>

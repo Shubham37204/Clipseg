@@ -39,8 +39,15 @@ export async function segmentImage(
 
   // Handle errors
   if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`API Error: ${response.status} - ${errorText}`);
+    let errorMessage = `API Error: ${response.status}`;
+    try {
+      const errorJson = await response.json();
+      errorMessage = errorJson.detail || errorMessage;
+    } catch {
+      const errorText = await response.text();
+      errorMessage = errorText || errorMessage;
+    }
+    throw new Error(errorMessage);
   }
 
   // Parse and return JSON
@@ -61,8 +68,15 @@ export async function segmentByImage(
 
   // Handle errors
   if (!response.ok) {
-    const errorText = await response.text();
-    throw new Error(`API Error: ${response.status} - ${errorText}`);
+    let errorMessage = `API Error: ${response.status}`;
+    try {
+      const errorJson = await response.json();
+      errorMessage = errorJson.detail || errorMessage;
+    } catch {
+      const errorText = await response.text();
+      errorMessage = errorText || errorMessage;
+    }
+    throw new Error(errorMessage);
   }
 
   // Parse and return JSON
