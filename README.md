@@ -60,6 +60,3 @@ docker-compose up --build
 - **Visual Prompts**: When drawing, fill the object area completely rather than just outlining it for better AI detection.
 - **Prompts**: Be descriptive in text mode (e.g., "a silver laptop" works better than just "laptop").
 
-## 📄 License
-
-MIT License. See `LICENSE` for details.
