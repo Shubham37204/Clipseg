@@ -1,7 +1,7 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 interface SegmentRequest {
-  image_base64: string; // raw base64, NO data:image/... prefix
+  image_base64: string; 
   prompt: string;
   threshold: number;
 }
@@ -10,6 +10,7 @@ interface SegmentResponse {
   mask_base64: string;
   prompt: string;
   overlay_base64: string;
+  inference_ms: number
 }
 
 export async function segmentImage(

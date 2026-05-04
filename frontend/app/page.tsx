@@ -15,12 +15,15 @@ export default function HomePage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [threshold, setThreshold] = useState(0.5);
+  const [inferenceMs, setInferenceMs] = useState<number | null>(null)
+
   const handleImageLoad = (base64: string, preview: string) => {
     setImageBase64(base64);
     setPreviewUrl(preview);
     setMaskBase64("");
     setOverlayBase64("");
     setError("");
+     setInferenceMs(null);
   };
 
   const handleSubmit = async () => {
@@ -29,6 +32,7 @@ export default function HomePage() {
     setError("");
     setMaskBase64("");
     setOverlayBase64("");
+    
 
     try {
       const res = await segmentImage({
@@ -38,6 +42,7 @@ export default function HomePage() {
       });
       setMaskBase64(res.mask_base64);
       setOverlayBase64(res.overlay_base64);
+      setInferenceMs(res.inference_ms)
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Something went wrong");
     } finally {
@@ -63,6 +68,7 @@ export default function HomePage() {
           originalUrl={previewUrl}
           maskBase64={maskBase64}
           overlayBase64={overlayBase64}
+           inferenceMs={inferenceMs ?? 0}
         />
       )}
     </div>
