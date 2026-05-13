@@ -1,0 +1,25 @@
+backend/
+├── config/
+│   ├── settings.py     → Load .env vars (HF token, cache dir, log level)
+│   └── constants.py    → MODEL_NAME, MAX_IMAGE_SIZE, DEFAULT_THRESHOLD
+├── models/
+│   └── __init__.py     → Load CLIPSeg model + processor at startup, move to GPU
+├── utils/
+│   └── __init__.py     → Image decode, resize, mask→base64, red overlay blend
+├── routes/
+│   └── __init__.py     → /segment (text) + /segment-by-image (visual) endpoints
+└── main.py             → FastAPI app, CORS, request logging middleware
+
+frontend/src/
+├── app/
+│   ├── page.tsx        → Landing page + workspace, step flow state machine
+│   └── layout.tsx      → Root HTML, Tailwind base styles
+├── components/
+│   ├── ImageUpload.tsx      → Drag-drop file picker, type+size validation
+│   ├── TextPrompt.tsx       → Text input + threshold slider
+│   ├── CanvasDrawer.tsx     → Draw mask on image, extract as base64
+│   ├── SegmentationResult.tsx → Tabbed Original/Mask/Overlay viewer + download
+│   ├── Navbar.tsx           → Top nav, launch button
+│   └── Footer.tsx           → Bottom bar
+└── services/
+    └── api.ts          → segmentImage() + segmentByImage() fetch wrappers
